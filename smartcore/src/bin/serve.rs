@@ -1,12 +1,9 @@
-use actix_web::{get, post, guard, web, App, HttpServer, HttpResponse, Responder};
+use actix_web::{get, guard, web, App, HttpServer, HttpResponse, Responder};
 use ndarray::Array;
-use smartcore::dataset::*;
+
 // Random Forest
 use smartcore::tree::decision_tree_classifier::DecisionTreeClassifier;
-// Model performance
-use smartcore::metrics::mean_squared_error;
-use smartcore::model_selection::train_test_split;
-use std::error::Error;
+
 use std::fs::File;
 use std::io::prelude::*;
 use std::str;
@@ -16,8 +13,6 @@ use simple_logger::SimpleLogger;
 
 
 const MODEL_PATH: &str ="/opt/ml/model/model.bincode";
-//const MODEL_PATH: &str ="/tmp/model.bincode";
-
 
 #[derive(Serialize)]
 struct Response {
@@ -25,6 +20,7 @@ struct Response {
 }
 
 struct AppData {
+    // Change the model here as needed
     model: DecisionTreeClassifier<f32>
 }
 
@@ -33,7 +29,11 @@ async fn ping() -> impl Responder {
     HttpResponse::Ok()
 }
 
+// Change this invocations function to 
+// 1. Parse the inference payload
+// 2. Send it to the data.model for prediction
 async fn invocations(body: web::Bytes, data: web::Data<AppData>) -> impl Responder {
+    // Parsing the inference payload\
     let csv = str::from_utf8(&body).unwrap();
     let v: Vec<f32> = csv
         .split(',')
@@ -41,17 +41,24 @@ async fn invocations(body: web::Bytes, data: web::Data<AppData>) -> impl Respond
         .collect();
     info!("Received: {:?}", v);
     let x = Array::from_shape_vec( (1, v.len() ), v).unwrap();
+    
+    // Prediction
     let y_hat = data.model.predict(&x).unwrap();
     info!("Prediction: {:?}", y_hat);
+
+    // Send the response
     HttpResponse::Ok().json(Response{
         prediction: y_hat[0] as f32,
     })
 }
 
+// Change this main function to load the model
+// The model is loaded here instaed of in the invocation function so it can be reused across invocations 
 #[actix_web::main]
 async fn main() -> std::io::Result<()> {
     SimpleLogger::new().init().unwrap();
     info!("Loading model from {}", MODEL_PATH);
+    // Change the model as needed
     let model: DecisionTreeClassifier<f32> = {
         let mut buf: Vec<u8> = Vec::new();
         File::open(MODEL_PATH)
@@ -73,7 +80,7 @@ async fn main() -> std::io::Result<()> {
             .route(
                 "/invocations",
                 web::post()
-                    .guard(guard::Header("content-type", "text/csv"))
+                    .guard(guard::Header("content-type", "text/csv")) // Change the content type as needed
                     .to(invocations),
             )
     })
