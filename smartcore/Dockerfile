@@ -1,14 +1,25 @@
-# Compile
-FROM rust:1.79.0 as builder
+# Speedup the build using https://depot.dev/blog/rust-dockerfile-best-practices
+# SageMaker don't support Docker Buildkit (need to confirm this?) so we can't use the other optimizations
+
+# Builder stage
+FROM rust:1.79.0 AS base
+RUN cargo install cargo-chef --version ^0.1
+
+# Planner stage
+FROM base AS planner
 WORKDIR /app
-COPY . /app
+COPY . .
+RUN cargo chef prepare --recipe-path recipe.json
+
+# Builder stage
+FROM base AS builder
+WORKDIR /app
+COPY --from=planner /app/recipe.json recipe.json
+RUN cargo chef cook --release --recipe-path recipe.json
+COPY . .
 RUN cargo build --release --bins
 
 # Deployment package
-# Not working right now, might need
 FROM debian:stable-slim
 COPY --from=builder /app/target/release/train /usr/bin/train
 COPY --from=builder /app/target/release/serve /usr/bin/serve
-
-# DEBUG ONLY, remove for prod => Mount it like this https://github.com/aws/amazon-sagemaker-examples/blob/main/advanced_functionality/scikit_bring_your_own/container/local_test/train_local.sh
-COPY dataset/iris.csv opt/ml/input/data/training/iris.csv

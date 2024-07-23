@@ -12,8 +12,8 @@ use simple_logger::SimpleLogger;
 use csv;
 
 
-//const TRAIN_DATA_PATH: &str = "opt/ml/input/data/training/iris.csv";
-const TRAIN_DATA_PATH: &str = "./dataset/iris.csv";
+const TRAIN_DATA_PATH: &str = "opt/ml/input/data/training/iris.csv";
+//const TRAIN_DATA_PATH: &str = "./dataset/iris.csv";
 const MODEL_OUTPUT_PATH: &str ="/opt/ml/model/model.bincode";
 //const MODEL_OUTPUT_PATH: &str ="/tmp/model.bincode"; // For local testing
 // TODO: failure ouptut path

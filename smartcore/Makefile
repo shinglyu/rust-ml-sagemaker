@@ -8,5 +8,9 @@ endif
 
 build:
 	docker build . -t smartcore $(DOCKER_NET)
-train:
-	docker run $(DOCKER_NET) smartcore train
+test-train: # Test training locally
+	rm -rf test_dir/model
+	rm -rf test_dir/output
+	mkdir -p test_dir/model
+	mkdir -p test_dir/output
+	docker run $(DOCKER_NET) -v $(CURDIR)/test_dir:/opt/ml smartcore train
