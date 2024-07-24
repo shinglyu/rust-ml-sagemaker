@@ -1,5 +1,5 @@
 # Rust Machine Learning on Amazon SageMaker
-This repository contains example containers to run machine learning using Rust machine learning frameworks on Amazon SageMaker. 
+This repository contains example containers to run machine learning using Rust machine learning frameworks on Amazon SageMaker. This is build using the SageMaker's [Bring your own container](https://docs.aws.amazon.com/sagemaker/latest/dg/docker-containers-create.html) feature.
 
 ## Prerequsite
 * (Optional) [Install Rust](https://www.rust-lang.org/tools/install)
@@ -9,6 +9,7 @@ This repository contains example containers to run machine learning using Rust m
   * Enable docker support for your SageMaker Domain by following this [doc](https://docs.aws.amazon.com/sagemaker/latest/dg/studio-updated-local.html#studio-updated-local-enable). Do this BEFORE you create your code-editor application.
   * Open a code-editor application in SageMaker Studio
   * Install docker following the [doc](https://docs.aws.amazon.com/sagemaker/latest/dg/studio-updated-local.html#studio-updated-local-enable)
+* If you want to push the container image to Elastic Container Registry (ECR), you need to set your credentials and ECR configuration in `.env`. 
 
 ## Usage
 Each top-level folder contains an example container definition for a Rust machine learning framework.
@@ -26,6 +27,20 @@ To use the container:
 * `make test-train`: Test model training locally
 * `make test-serve`: start the model inference server for local testing
   * `make test-predict`: Send a inference request to the inference server
+
+### Push to ECR
+* Set your ECR configuration in `.env` in the top level directry
+* Attach the policy `AmazonEC2ContainerRegistryPowerUser` to your IAM role/user. If you are running in SageMaker Studio, add it to the execution role of your SageMaker Domain profile.
+* Go back to the framework folder, run `make create-ecr-repo` to create the ECR repository
+* Run `make build-and-push` to build and push the image to ECR
+
+# Testing
+* We use `git-secrets` to scan for credentials and secrets
+```
+sudo apt install git-secrets
+git secrets --install
+git secrets --register-aws
+```
 
 ## Citation
 * Dataset
