@@ -72,5 +72,5 @@ git secrets --register-aws
 - [ ] Support pipe mode
 - [ ] Support batch inference
 - [ ] Support data processing job
-- [ ] Add example Python notebook
+- [x] Add example Python notebook
 - [ ] Add example Rust notebook 
