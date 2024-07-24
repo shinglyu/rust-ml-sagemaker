@@ -34,6 +34,23 @@ To use the container:
 * Go back to the framework folder, run `make create-ecr-repo` to create the ECR repository
 * Run `make build-and-push` to build and push the image to ECR
 
+### Training and Deploying
+Once you have built and pushed your container image to ECR, you can train and deploy your model using one of the following options:
+
+**Option 1: Using the AWS Console**
+
+1. Create a Training Job using the AWS Console > SageMaker > Training Jobs > Create training job > Select "Your own algorithm container in ECR" as algorithm source. 
+2. Create the Model, Endpoint configuration, and deploy the endpoint using the AWS Console > SageMaker > Inference section.
+
+**Option 2: Using the included example SageMaker notebook**
+
+There is an `train_and_deploy.ipynb` notebook in each folder. Open them in SageMaker Studio and execute all cells. It shows how to run train the model and deploy as an endpoint using SageMaker Python SDK.
+
+**Option 3: Using the AWS SDK for Python or Rust or AWS CLI**
+
+1. Use the AWS SDK in Python or AWS SDK for Rust to create a training job and deploy your model.
+2. Alternatively, use the AWS CLI to create a training job and deploy your model.
+
 # Testing
 * We use `git-secrets` to scan for credentials and secrets
 ```
