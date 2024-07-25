@@ -1,4 +1,4 @@
-- [ ] Add Linfa framework
+- [x] Add Linfa framework
 - [ ] Add Burn framework
 - [ ] Add Polars framework
 - [ ] Add more Rust ML framework

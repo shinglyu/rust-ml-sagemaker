@@ -14,7 +14,7 @@ This repository contains example containers to run machine learning using Rust m
 ## Usage
 Each top-level folder contains an example container definition for a Rust machine learning framework.
 * `smartcore`: [SmartCore](smartcore/src/bin/train-benchmark.rs) ([GitHub](smartcore/src/bin/train-benchmark.rs))
-* `linfa`: coming soon
+* `linfa`: [Linfa](https://github.com/rust-ml/linfa) 
 * `burn`: coming soon
 
 To use the container:
