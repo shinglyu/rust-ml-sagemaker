@@ -2,8 +2,12 @@ use std::error::Error;
 use std::fs::File;
 use std::io::prelude::*;
 
+use ndarray::Array;
+use ndarray::prelude::*;
+use ndarray_csv::Array2Reader;
+
 use linfa::prelude::*;
-use linfa_trees::{DecisionTree, Result, SplitQuality};
+use linfa_trees::{DecisionTree, SplitQuality};
 use ndarray_rand::rand::{SeedableRng};
 use rand::rngs::SmallRng;
 use log::info;
@@ -18,12 +22,59 @@ const MODEL_OUTPUT_PATH: &str = "/opt/ml/model/";
 // 3. Write your model artifact to MODEL_OUTPUT_PATH
 
 // This example is taken from https://github.com/rust-ml/linfa/blob/master/algorithms/linfa-trees/examples/decision_tree.rs
-fn main() -> Result<()> {
+fn main() -> Result<(), Box<dyn Error>> {
     SimpleLogger::new().init().unwrap();
 
+    info!("Loading dataset");
+    let mut reader = csv::ReaderBuilder::new()
+       .has_headers(false)
+       .from_path(TRAIN_DATA_PATH)
+       .expect(&format!("Fail to read the CSV at {}", TRAIN_DATA_PATH));
+
+       
+    let data: Array2<String> = reader.deserialize_array2_dynamic()?;
+    
+    // Parsing the training dataset into features (x) and target (y)
+    let x_strings = data.slice(s![..,0..4]);
+    let mut vec_x: Vec<f32> = Vec::new();
+    for i in x_strings.iter() {
+        vec_x.push(i.parse().unwrap());
+    }
+    let x = Array::from_shape_vec( (data.nrows(), 4), vec_x )?;
+    let y_strings = data.slice(s![.., 4]);
+    let mut vec_y: Vec<&str> = Vec::new();
+    for t in y_strings.iter() {
+        vec_y.push(t);
+    }
+    let y = Array::from_shape_vec(data.nrows(), vec_y).unwrap();
+    
+    info!("Dataset loaded and preprocessed");
+    let data = Dataset::new(x, y); // TODO: with feature names // TODO use map_targets
+    // Parsing the training dataset into features (x) and target (y)
+    /*
+    let x_strings = data.slice(s![..,0..4]);
+    let mut vec_x: Vec<f64> = Vec::new();
+    for i in x_strings.iter() {
+        vec_x.push(i.parse().unwrap());
+    }
+    let x = Array::from_shape_vec( (data.nrows(), 4), vec_x )?;
+    let y_strings = data.slice(s![.., 4]);
+    let mut vec_y: Vec<f64> = Vec::new();
+    for t in y_strings.iter() {
+        let t_f = match t.as_str() {
+            "Iris-setosa" => 0.,
+            "Iris-versicolor" => 1.,
+            "Iris-virginica" => 2.,
+            _ => 0.,
+        };
+        vec_y.push(t_f);
+    }
+    let y = Array::from_shape_vec(data.nrows(), vec_y).unwrap();
+    */
+    
+    info!("Dataset loaded and preprocessed");
     let mut rng = SmallRng::seed_from_u64(42);
-    //TODO: read dataset from file
-    let (train, test) = linfa_datasets::iris().shuffle(&mut rng).split_with_ratio(0.8);
+    let (train, test) = data.shuffle(&mut rng).split_with_ratio(0.8);
 
     println!("Training model with Gini criterion ...");
     let gini_model = DecisionTree::params()
