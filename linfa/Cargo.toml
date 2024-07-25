@@ -16,8 +16,13 @@ path = "src/bin/serve.rs"
 actix-web = "4.1.0"
 bincode = "1.3.3"
 csv = "1.1.6"
+linfa = "0.7.0"
+linfa-datasets = { version = "0.7.0", features = ["iris"] }
+linfa-trees = { version = "0.7.0", features = ["serde"] }
 log = "0.4.17"
 ndarray = "0.15.6"
 ndarray-csv = "0.5.1"
+ndarray-rand = "0.14.0"
+rand = "0.8.5"
 serde = "1.0.143"
 simple_logger = "2.3.0"
