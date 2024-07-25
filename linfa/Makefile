@@ -19,9 +19,9 @@ test-train: # Test training locally
 	mkdir -p test_dir/output
 	docker run $(DOCKER_NET) -v $(CURDIR)/test_dir:/opt/ml --rm $(TAG) train
 test-serve: # Start the inference server locally for testing
-	docker run $(DOCKER_NET) -v $(CURDIR)/test_dir/model:/opt/ml/model -p 8080:8080 --rm $(TAG) serve
+	docker run $(DOCKER_NET) -v $(CURDIR)/test_dir/model:/opt/ml/model --rm $(TAG) serve
 test-predict: # Send a inference request to the server started by test-serve
-	curl -X POST -H "Content-Type: text/csv" -v --data-raw "1,2,3,4,5" http://localhost:8080/invocations
+	curl -X POST -H "Content-Type: text/csv" -v --data-raw "1,2,3,4" http://localhost:8080/invocations
 build-and-push: # Build for linux target and push to ECR
 	docker build . -t $(TAG) $(DOCKER_NET) --platform=linux/amd64
 	aws ecr get-login-password --region $(REGION) | docker login --username AWS --password-stdin $(ACCOUNT_NUMBER).dkr.ecr.$(REGION).amazonaws.com
