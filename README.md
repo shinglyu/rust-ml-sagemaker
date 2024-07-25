@@ -64,13 +64,5 @@ git secrets --register-aws
   * Iris dataset: Fisher,R. A.. (1988). Iris. UCI Machine Learning Repository. https://doi.org/10.24432/C56C76
 
 ## Roadmap
-- [ ] Add Linfa framework
-- [ ] Add Burn framework
-- [ ] Add Polars framework
-- [ ] Add more Rust ML framework
-- [ ] Support full BYOC input/output (e.g. `hyperparameters.json`, `resourceConfig.json`, `ouptut/failure`)
-- [ ] Support pipe mode
-- [ ] Support batch inference
-- [ ] Support data processing job
-- [x] Add example Python notebook
-- [ ] Add example Rust notebook 
+See [TODO.md](./TODO.md)
+
