@@ -35,18 +35,25 @@ fn main() -> Result<(), Box<dyn Error>> {
     let data: Array2<String> = reader.deserialize_array2_dynamic()?;
     
     // Parsing the training dataset into features (x) and target (y)
-    let x_strings = data.slice(s![..,0..4]);
-    let mut vec_x: Vec<f32> = Vec::new();
-    for i in x_strings.iter() {
-        vec_x.push(i.parse().unwrap());
-    }
-    let x = Array::from_shape_vec( (data.nrows(), 4), vec_x )?;
+    let x_strings = data.slice(s![.., 0..4]);
+    let parsed_x_strings: Vec<_> = x_strings
+        .into_iter()
+        .flat_map(|s| s.parse::<f32>().ok())
+        .collect();
+    let x = Array::from_shape_vec((data.nrows(), 4), parsed_x_strings)?;
+    
+    /*
+    let y_array_view = data.slice(s![.., 4]);
+    let y: Array<String, _> = y_array_view.iter().map(|s| s.to_string()).collect();
+    */
     let y_strings = data.slice(s![.., 4]);
     let mut vec_y: Vec<&str> = Vec::new();
     for t in y_strings.iter() {
         vec_y.push(t);
     }
     let y = Array::from_shape_vec(data.nrows(), vec_y).unwrap();
+
+
     
     info!("Dataset loaded and preprocessed");
     let data = Dataset::new(x, y); // TODO: with feature names // TODO use map_targets
